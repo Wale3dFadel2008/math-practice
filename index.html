@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دفتر الرياضيات - أسئلة لا تنتهي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+:root{
+  --desk:#e8eef6; --grid:#d0dcea; --paper:#fcfdff; --ink:#16233f; --ink2:#55637f;
+  --line:#c3d1e2; --margin:#d9534f; --accent:#23459f;
+  --selbg:#fff0a0; --selink:#16233f;
+  --ok:#11794f; --okbg:#e2f5ec; --bad:#b83232; --badbg:#fde8e8;
+  --solbg:#eef3fb;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --desk:#0c1323; --grid:#17233d; --paper:#142039; --ink:#e8eefb; --ink2:#a2b2d0;
+    --line:#2b3c61; --margin:#e46a62; --accent:#93b3ff;
+    --selbg:#5b4c00; --selink:#fff6c7;
+    --ok:#5fdca6; --okbg:#0f3a2c; --bad:#ff8f8f; --badbg:#3e1b20;
+    --solbg:#1a2a4a;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; color:var(--ink);
+  font-family:"Tajawal","Segoe UI",Tahoma,Arial,sans-serif; font-size:17px; line-height:1.7;
+  background-color:var(--desk);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 60px}
+header h1{margin:6px 0 2px;font-size:clamp(28px,6vw,42px);font-weight:800;letter-spacing:0}
+header .lead{margin:0;color:var(--ink2);font-size:16px}
+
+.stats{
+  display:grid;grid-template-columns:repeat(5,1fr);margin-top:18px;
+  background:var(--paper);border:1.5px solid var(--line);
+}
+.stat{padding:10px 6px;text-align:center;border-inline-start:1.5px solid var(--line)}
+.stat:first-child{border-inline-start:0}
+.stat b{display:block;font-size:24px;font-weight:800;line-height:1.2}
+.stat span{font-size:13px;color:var(--ink2)}
+.stat.ok b{color:var(--ok)} .stat.bad b{color:var(--bad)}
+
+.controls{margin-top:16px;display:grid;gap:12px}
+.row-label{font-size:14px;color:var(--ink2);margin-bottom:6px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip,.seg button{
+  font:inherit;font-size:15px;cursor:pointer;padding:5px 13px;
+  background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;
+}
+.chip[aria-pressed="true"]{background:var(--selbg);color:var(--selink);border-color:var(--ink);font-weight:700}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:700}
+.chip:focus-visible,.seg button:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mini{font:inherit;font-size:14px;color:var(--accent);background:none;border:0;cursor:pointer;text-decoration:underline;padding:0}
+
+.sheet{
+  position:relative;margin-top:22px;background:var(--paper);border:1.5px solid var(--line);
+  padding:22px 18px 20px 20px;padding-right:86px;
+}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;right:62px;width:2px;background:var(--margin)}
+.qn{position:absolute;right:0;top:18px;width:62px;text-align:center;line-height:1.1}
+.qn b{display:block;font-size:30px;font-weight:800}
+.qn small{font-size:12px;color:var(--ink2)}
+.tag{display:inline-block;font-size:13px;color:var(--ink2);border:1.5px solid var(--line);padding:0 10px;border-radius:999px;margin-bottom:8px}
+.qtext{margin:0 0 6px;font-size:20px;font-weight:500}
+.blk{direction:ltr;text-align:center;overflow-x:auto;overflow-y:hidden;padding:8px 0 12px;font-size:1.25em;max-width:100%}
+.m{direction:ltr;unicode-bidi:isolate;display:inline-block;max-width:100%}
+.m.raw{font-family:monospace}
+.word{font-family:"Courier New",monospace;font-weight:700;letter-spacing:2px;font-size:1.1em}
+.katex{font-size:1.1em}
+
+.opts{display:grid;gap:10px;margin-top:6px}
+@media(min-width:680px){.opts{grid-template-columns:1fr 1fr}}
+.opt{
+  font:inherit;font-size:19px;color:var(--ink);cursor:pointer;text-align:right;
+  display:flex;align-items:center;gap:12px;padding:11px 14px;min-height:56px;
+  background:var(--paper);border:1.5px solid var(--line);border-radius:10px;
+}
+.opt:hover:not(:disabled){background:var(--selbg);color:var(--selink);border-color:var(--ink)}
+.opt .let{flex:none;width:32px;height:32px;display:grid;place-items:center;border:1.5px solid var(--ink2);border-radius:8px;font-weight:700;font-size:16px;color:var(--ink2)}
+.opt .otext{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden}
+.opt:disabled{cursor:default}
+.opt.correct{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.opt.correct .let{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.opt.wrong .let{background:var(--bad);border-color:var(--bad);color:var(--paper)}
+
+.fb{margin-top:14px}
+.verdict{font-weight:800;font-size:18px}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.sol{margin-top:8px;background:var(--solbg);border-right:4px solid var(--accent);padding:10px 14px;font-size:17px;overflow-x:auto}
+.sol .t{font-weight:700;display:block;margin-bottom:2px}
+
+.actions{display:flex;gap:10px;justify-content:space-between;margin-top:16px}
+.btn{
+  font:inherit;font-weight:700;font-size:17px;cursor:pointer;padding:9px 22px;border-radius:10px;
+  background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);
+}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn[hidden]{display:none}
+
+.result h2{margin:0 0 4px;font-size:30px;font-weight:800}
+.result .big{font-size:56px;font-weight:800;line-height:1.1}
+.note{margin-top:22px;font-size:14px;color:var(--ink2)}
+
+@media(max-width:560px){
+  body{font-size:16px}
+  .sheet{padding-right:62px;padding-left:12px}
+  .sheet::before{right:44px}
+  .qn{width:44px} .qn b{font-size:24px}
+  .qtext{font-size:18px}
+  .opt{font-size:17px}
+  .stat b{font-size:20px} .stat span{font-size:12px}
+}
+@media(prefers-reduced-motion:no-preference){
+  .opt{transition:background .12s,border-color .12s}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>دفتر الرياضيات</h1>
+    <p class="lead">أسئلة اختيار من متعدد لا تنتهي ولا تتكرر، مبنية على دروس نماذج الاختبارات.</p>
+  </header>
+
+  <section class="stats" aria-label="النتيجة">
+    <div class="stat ok"><b id="sRight">0</b><span>صحيحة</span></div>
+    <div class="stat bad"><b id="sWrong">0</b><span>خاطئة</span></div>
+    <div class="stat"><b id="sStreak">0</b><span>سلسلة متتالية</span></div>
+    <div class="stat"><b id="sAcc">0%</b><span>الدقة</span></div>
+    <div class="stat"><b id="sSeen">0</b><span>أسئلة ظهرت</span></div>
+  </section>
+
+  <section class="controls">
+    <div>
+      <div class="row-label">الدروس <button class="mini" id="allOn">تحديد الكل</button></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div>
+      <div class="row-label">نمط الحل</div>
+      <div class="seg" id="modes"></div>
+    </div>
+  </section>
+
+  <main id="stage"></main>
+
+  <p class="note">الأسئلة تُولَّد عشوائياً من أرقام جديدة في كل مرة، ولا يظهر السؤال نفسه مرتين أثناء بقائك في الصفحة. اختصارات لوحة المفاتيح: 1 إلى 4 للإجابة، و Enter للسؤال التالي.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ============ أدوات عامة ============ */
+const R={
+  int:(a,b)=>Math.floor(Math.random()*(b-a+1))+a,
+  pick:a=>a[Math.floor(Math.random()*a.length)],
+  shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;},
+  nz(a,b){let v=0;while(v===0)v=R.int(a,b);return v;}
+};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const uniq=a=>[...new Set(a)];
+const M=s=>'$'+s+'$';
+const fr=(n,d=1)=>{if(d<0){n=-n;d=-d;}const g=gcd(n,d)||1;return{n:n/g,d:d/g};};
+const frT=f=>f.d===1?String(f.n):(f.n<0?'-':'')+'\\frac{'+Math.abs(f.n)+'}{'+f.d+'}';
+const comb=(n,k)=>{if(k<0||k>n)return 0;k=Math.min(k,n-k);let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return Math.round(r);};
+const fact=n=>{let r=1;for(let i=2;i<=n;i++)r*=i;return r;};
+const perm=(n,k)=>{let r=1;for(let i=0;i<k;i++)r*=(n-i);return r;};
+const cx=c=>c===1?'':c===-1?'-':String(c);
+const pw=(v,p)=>p===0?'':p===1?v:v+'^{'+p+'}';
+const sg=n=>n<0?'-'+Math.abs(n):'+'+n;
+const ORD=['','الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع'];
+
+function polyTex(terms,v='x'){
+  const ts=terms.filter(t=>t.c!==0).sort((a,b)=>b.p-a.p);
+  let s='';
+  ts.forEach(t=>{
+    const a=Math.abs(t.c),neg=t.c<0;let body;
+    if(t.p===0)body=String(a);
+    else if(t.p>0)body=(a===1?'':a)+pw(v,t.p);
+    else body='\\frac{'+a+'}{'+pw(v,-t.p)+'}';
+    s+=s===''?(neg?'-':'')+body:(neg?'-':'+')+body;
+  });
+  return s||'0';
+}
+function polyMut(terms,n=10){
+  const out=new Set();let tries=0;
+  while(out.size<n&&tries<80){
+    tries++;
+    const t=terms.map(x=>({...x}));const i=R.int(0,t.length-1);const m=R.int(0,3);
+    if(m===0)t[i].c+=R.pick([-2,-1,1,2]);
+    else if(m===1)t[i].c=-t[i].c;
+    else if(m===2)t[i].p+=R.pick([-1,1]);
+    else t[i].c*=R.pick([2,-2]);
+    if(t[i].c===0)continue;
+    if(new Set(t.map(x=>x.p)).size!==t.length)continue;
+    out.add(polyTex(t));
+  }
+  return [...out];
+}
+function linXY(a,b){
+  let s='';
+  [[a,'x'],[b,'y']].forEach(([c,v])=>{
+    if(!c)return;
+    const body=(Math.abs(c)===1?'':Math.abs(c))+v;
+    s+=s===''?(c<0?'-':'')+body:(c<0?'-':'+')+body;
+  });
+  return s||'0';
+}
+const pm=m=>'\\begin{pmatrix}'+m.map(r=>r.join('&')).join('\\\\')+'\\end{pmatrix}';
+const vm=m=>'\\begin{vmatrix}'+m.map(r=>r.join('&')).join('\\\\')+'\\end{vmatrix}';
+const det3=m=>m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])-m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+const mul2=(A,B)=>[[A[0][0]*B[0][0]+A[0][1]*B[1][0],A[0][0]*B[0][1]+A[0][1]*B[1][1]],[A[1][0]*B[0][0]+A[1][1]*B[1][0],A[1][0]*B[0][1]+A[1][1]*B[1][1]]];
+const mutM=m=>{const c=m.map(r=>r.slice());const i=R.int(0,1),j=R.int(0,1);c[i][j]=R.pick([c[i][j]+1,c[i][j]-1,c[i][j]+2,-c[i][j]]);return c;};
+
+/* ============ بناء السؤال ============ */
+function mk(o){
+  const w=uniq(o.wrong).filter(x=>x!==o.correct);
+  if(w.length<3)return null;
+  const opts=R.shuffle([o.correct,...w.slice(0,3)]);
+  return{cat:o.cat,text:o.text,block:o.block||'',options:opts,answer:opts.indexOf(o.correct),sol:o.sol||'',key:o.cat+'|'+o.text+'|'+(o.block||'')};
+}
+const numFill=v=>R.shuffle([v+1,v-1,v+2,v-2,-v,v*2,v+3,v-3,v+10,v-10,v+5,v-5]).filter(x=>x!==v);
+function mkNum(o,v,extras){
+  o.correct=M(v);
+  const ex=R.shuffle((extras||[]).filter(x=>Number.isFinite(x)&&x!==v));
+  o.wrong=uniq([...ex,...numFill(v)]).map(M);
+  return mk(o);
+}
+function frFill(f){
+  const l=[fr(f.n+1,f.d),fr(f.n-1,f.d),fr(f.n,f.d+1),fr(f.n,f.d+2),fr(-f.n,f.d),fr(f.n*2,f.d),fr(f.n,f.d*2),fr(f.n+f.d,f.d)];
+  if(f.n!==0)l.unshift(fr(f.d,f.n));
+  return l;
+}
+function mkFrac(o,f,extras){
+  const c=frT(f);o.correct=M(c);
+  const ex=R.shuffle((extras||[]).filter(g=>g.d!==0).map(frT));
+  o.wrong=uniq([...ex,...R.shuffle(frFill(f).map(frT))]).filter(x=>x!==c).map(M);
+  return mk(o);
+}
+const T=(o,c,w,suf='')=>{o.correct=M(c+suf);o.wrong=R.shuffle(w).map(x=>M(x+suf));return mk(o);};
+const S_=(o,c,w)=>{o.correct=c;o.wrong=R.shuffle(w);return mk(o);};
+
+/* ============ 1) الأسس واللوغاريتمات ============ */
+const powFr=(a,da,b,db)=>{let n=1,d=1;
+  if(da>=0)n*=Math.pow(a,da);else d*=Math.pow(a,-da);
+  if(db>=0)n*=Math.pow(b,db);else d*=Math.pow(b,-db);
+  return fr(n,d);};
+
+function gExpRatio(){
+  const bs=R.shuffle([2,3,5,7]),a=bs[0],b=bs[1];
+  let m,p,n,q;
+  do{m=R.int(2,12);p=R.int(2,12);n=R.int(2,12);q=R.int(2,12);}
+  while((m===p&&n===q)||Math.abs(m-p)>5||Math.abs(n-q)>5);
+  const da=m-p,db=n-q,val=powFr(a,da,b,db);
+  return mkFrac({cat:'explog',text:'احسب قيمة:',
+    block:`\\dfrac{${a}^{${m}}\\times ${b}^{${n}}}{${a}^{${p}}\\times ${b}^{${q}}}`,
+    sol:`نطرح الأسس للأساس نفسه:\n$${a}^{${m}-${p}}\\times ${b}^{${n}-${q}}=${a}^{${da}}\\times ${b}^{${db}}=${frT(val)}$`},
+    val,[powFr(a,da,b,-db),powFr(a,-da,b,db),powFr(a,da+1,b,db),powFr(a,da,b,db+1),powFr(a,da,b,db-1),powFr(a,da-1,b,db),powFr(a,-da,b,-db)]);
+}
+function gLogSum(){
+  const b=R.pick([2,3,4,5]),k=R.int(1,{2:6,3:4,4:3,5:3}[b]);
+  const j=R.pick([-4,-3,-2,-1,1,2,3,4]);
+  const A=Math.pow(b,k),B=j>0?String(Math.pow(10,j)):'0.'+'0'.repeat(-j-1)+'1';
+  const op=R.pick(['+','+','-']);
+  const v=op==='+'?k+j:k-j;
+  return mkNum({cat:'explog',text:'احسب قيمة:',
+    block:`\\log_{${b}}${A}\\ ${op}\\ \\log_{10}${B}`,
+    sol:`$\\log_{${b}}${A}=${k}$ لأن $${b}^{${k}}=${A}$\n$\\log_{10}${B}=${j}$ لأن $10^{${j}}=${B}$\nالناتج: $${k}${op}(${j})=${v}$`},
+    v,[k*j,k+j,k-j,j-k,-v]);
+}
+function gLogLaw(){
+  const t=R.int(0,1);
+  if(t===0){
+    const b=R.pick([2,3,5,10]),k=R.int(1,3),B=R.pick([2,3,4,5,6,7]),A=B*Math.pow(b,k);
+    return mkNum({cat:'explog',text:'احسب قيمة:',
+      block:`\\log_{${b}}${A}-\\log_{${b}}${B}`,
+      sol:`الفرق بين لوغاريتمين = لوغاريتم القسمة:\n$\\log_{${b}}\\dfrac{${A}}{${B}}=\\log_{${b}}${Math.pow(b,k)}=${k}$`},
+      k,[k+1,k-1,A-B,Math.pow(b,k)]);
+  }
+  const b=R.pick([2,3,5,6,10]),k=R.int(2,3),N=Math.pow(b,k);
+  const ds=[];for(let d=2;d<N;d++)if(N%d===0)ds.push(d);
+  if(!ds.length)return null;
+  const A=R.pick(ds),B=N/A;
+  return mkNum({cat:'explog',text:'احسب قيمة:',
+    block:`\\log_{${b}}${A}+\\log_{${b}}${B}`,
+    sol:`مجموع لوغاريتمين = لوغاريتم الضرب:\n$\\log_{${b}}(${A}\\times ${B})=\\log_{${b}}${N}=${k}$`},
+    k,[k+1,k-1,A+B,N]);
+}
+function gExpEq(){
+  const a=R.pick([2,3,5]),maxr={2:7,3:5,5:3}[a];
+  let p,q,s,r;
+  do{p=R.int(1,4);s=R.int(-3,5);q=R.int(-5,6);r=p*s+q;}while(!(r>=1&&r<=maxr)||q===0);
+  const lhs=polyTex([{c:p,p:1},{c:q,p:0}]);
+  return mkNum({cat:'explog',text:'أوجد قيمة $x$ التي تحقق المعادلة:',
+    block:`${a}^{${lhs}}=${Math.pow(a,r)}`,
+    sol:`نكتب $${Math.pow(a,r)}=${a}^{${r}}$ ثم نساوي الأسس:\n$${lhs}=${r}\\Rightarrow x=${s}$`},
+    s,[r,-s,r-q,s+1,s-1]);
+}
+function gLogEq(){
+  const b=R.pick([2,3,5]),r=R.int(1,{2:5,3:3,5:2}[b]),N=Math.pow(b,r);
+  const p=R.int(1,4),s=R.int(1,8),q=N-p*s;
+  if(q===0)return null;
+  const arg=polyTex([{c:p,p:1},{c:q,p:0}]);
+  return mkNum({cat:'explog',text:'أوجد قيمة $x$ التي تحقق المعادلة:',
+    block:`\\log_{${b}}(${arg})=${r}`,
+    sol:`نحوّل إلى الصيغة الأسية:\n$${arg}=${b}^{${r}}=${N}\\Rightarrow ${cx(p)}x=${N-q}\\Rightarrow x=${s}$`},
+    s,[N,N-q,s+1,s-1,r]);
+}
+
+/* ============ 2) المعادلات والأنظمة ============ */
+const fac=r=>r>0?`(x-${r})`:`(x+${-r})`;
+const setT=(a,b)=>{const[x,y]=[a,b].sort((u,v)=>u-v);return'\\{'+x+',\\ '+y+'\\}';};
+function gQuad(){
+  const r1=R.nz(-9,9),r2=R.nz(-9,9);if(r1===r2)return null;
+  const s=r1+r2,pr=r1*r2;
+  const eq=polyTex([{c:1,p:2},{c:-s,p:1},{c:pr,p:0}]);
+  const w=[setT(-r1,-r2),setT(r1,-r2),setT(-r1,r2),setT(r1+1,r2),setT(r1,r2-1),setT(r1+1,r2+1)].filter(x=>{const m=x.match(/-?\d+/g);return m[0]!==m[1];});
+  return T({cat:'eq',text:'أوجد مجموعة حل المعادلة:',block:`${eq}=0`,
+    sol:`نحلل إلى عاملين:\n$${eq}=${fac(r1)}${fac(r2)}=0$\nإذن $x=${r1}$ أو $x=${r2}$`},setT(r1,r2),w);
+}
+function gQuadSP(){
+  const r1=R.nz(-7,7),r2=R.nz(-7,7);if(r1===r2)return null;
+  const a=R.pick([1,2,3]),s=r1+r2,pr=r1*r2;
+  const eq=polyTex([{c:a,p:2},{c:-a*s,p:1},{c:a*pr,p:0}]);
+  const askSum=R.pick([true,false]);
+  const v=askSum?s:pr;
+  return mkNum({cat:'eq',text:askSum?'ما مجموع جذري المعادلة:':'ما حاصل ضرب جذري المعادلة:',block:`${eq}=0`,
+    sol:`نحلل: $${a===1?'':a}${fac(r1)}${fac(r2)}=0$ فالجذران $${r1}$ و $${r2}$\n${askSum?`المجموع $=${r1}+(${r2})=${s}$`:`الضرب $=${r1}\\times(${r2})=${pr}$`}`},
+    v,[askSum?-s:-pr,askSum?pr:s,a*v,askSum?a*s:a*pr]);
+}
+function gSystem(){
+  const x0=R.int(-4,5),y0=R.int(-4,5);
+  let a1,b1,a2,b2,D;
+  do{a1=R.nz(-3,4);b1=R.nz(-3,4);a2=R.nz(-3,4);b2=R.nz(-3,4);D=a1*b2-a2*b1;}while(D===0);
+  const c1=a1*x0+b1*y0,c2=a2*x0+b2*y0;
+  const P=(x,y)=>`(${x},\\ ${y})`;
+  const Dx=c1*b2-c2*b1,Dy=a1*c2-a2*c1;
+  return T({cat:'eq',text:'أوجد مجموعة حل النظام (بالحذف أو بقاعدة كرامر):',
+    block:`\\begin{cases}${linXY(a1,b1)}=${c1}\\\\ ${linXY(a2,b2)}=${c2}\\end{cases}`,
+    sol:`$D=${D}$ ، $D_x=${Dx}$ ، $D_y=${Dy}$\n$x=\\dfrac{D_x}{D}=${x0}$ ، $y=\\dfrac{D_y}{D}=${y0}$`},
+    P(x0,y0),[P(y0,x0),P(x0,-y0),P(-x0,y0),P(x0+1,y0),P(x0,y0+1),P(x0-1,y0-1)]);
+}
+
+/* ============ 3) المحددات ============ */
+const randM3=(lo,hi)=>[0,1,2].map(()=>[0,1,2].map(()=>R.int(lo,hi)));
+function gDet3(){
+  const m=randM3(-3,5),d=det3(m);
+  const a=m[0][0],b=m[0][1],c=m[0][2];
+  const wrongSign=a*(m[1][1]*m[2][2]-m[1][2]*m[2][1])+b*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+c*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+  return mkNum({cat:'det',text:'احسب قيمة المحدد:',block:`\\Delta=${vm(m)}`,
+    sol:`نفك المحدد حسب الصف الأول مع الإشارات $(+,-,+)$:\n$\\Delta=${a}(${m[1][1]*m[2][2]-m[1][2]*m[2][1]})-(${b})(${m[1][0]*m[2][2]-m[1][2]*m[2][0]})+(${c})(${m[1][0]*m[2][1]-m[1][1]*m[2][0]})=${d}$`},
+    d,[-d,wrongSign,d+a,d-b]);
+}
+function gDetX(){
+  let m,cof,x0;
+  do{m=randM3(-3,4);m[0][0]=0;cof=m[1][1]*m[2][2]-m[1][2]*m[2][1];}while(cof===0);
+  const rest=det3(m);
+  x0=R.nz(-4,6);
+  const T0=cof*x0+rest;
+  const mm=m.map(r=>r.slice());mm[0][0]='x';
+  return mkNum({cat:'det',text:`أوجد قيمة $x$ التي تجعل $\\Delta=${T0}$ حيث:`,block:`\\Delta=${vm(mm)}`,
+    sol:`بفك المحدد حسب الصف الأول:\n$\\Delta=${cx(cof)}x${rest===0?'':sg(rest)}$\n$${cx(cof)}x${rest===0?'':sg(rest)}=${T0}\\Rightarrow x=${x0}$`},
+    x0,[-x0,x0+1,x0-1,T0]);
+}
+function gDetProp(){
+  const k=R.pick([2,3,-1,-2,4]);
+  const v1=[R.nz(-3,4),R.nz(-3,4),R.nz(-3,4)],v2=[R.int(-3,4),R.int(-3,4),R.int(-3,4)];
+  const rows=R.shuffle([0,1,2]);
+  const m=[[],[],[]];
+  m[rows[0]]=v1;m[rows[1]]=v1.map(x=>x*k);m[rows[2]]=v2;
+  const i=Math.min(rows[0],rows[1])+1,j=Math.max(rows[0],rows[1])+1;
+  const big=rows[1]+1,small=rows[0]+1;
+  const ex=[];for(let t=0;t<5;t++)ex.push(R.nz(-18,18));
+  return mkNum({cat:'det',text:'احسب قيمة المحدد (لاحظ العلاقة بين صفّين):',block:`\\Delta=${vm(m)}`,
+    sol:`الصف ${ORD[big]} = $${k}\\times$ الصف ${ORD[small]}\nأي أن صفّين متناسبان، فالمحدد $\\Delta=0$`},
+    0,ex);
+}
+function gDetRule(){
+  const t=R.int(0,5);
+  if(t===0){const d=R.nz(-5,6),k=R.int(2,4);
+    return mkNum({cat:'det',text:`إذا كانت $A$ مصفوفة مربعة من الرتبة $3$ وكان $|A|=${d}$، فإن $|${k}A|=$`,
+      sol:`عند ضرب كل صفوف المصفوفة الثلاثة في $${k}$ يُضرب المحدد في $${k}^3$:\n$|${k}A|=${k}^3\\times ${d}=${Math.pow(k,3)*d}$`},
+      Math.pow(k,3)*d,[d*k,d*k*k,d+k,Math.pow(k,3)+d]);}
+  if(t===1){const d1=R.nz(-4,5),d2=R.nz(-4,5);
+    return mkNum({cat:'det',text:`إذا كان $|A|=${d1}$ و $|B|=${d2}$ لمصفوفتين مربعتين من الرتبة نفسها، فإن $|A\\cdot B|=$`,
+      sol:`$|AB|=|A|\\cdot|B|=${d1}\\times(${d2})=${d1*d2}$`},
+      d1*d2,[d1+d2,d1-d2,-d1*d2]);}
+  if(t===2){const d=R.nz(-9,9);
+    return mkNum({cat:'det',text:`محدد قيمته $${d}$. إذا بدّلنا موضع صفّين فيه، تصبح قيمته:`,
+      sol:`تبديل صفّين يضرب المحدد في $-1$ فتصبح القيمة $${-d}$`},
+      -d,[d,0,2*d,d*d]);}
+  if(t===3){const d=R.nz(-6,7),k=R.int(2,6);
+    return mkNum({cat:'det',text:`محدد قيمته $${d}$. إذا ضربنا أحد صفوفه في العدد $${k}$ فقط، تصبح قيمته:`,
+      sol:`ضرب صف واحد في $${k}$ يضرب المحدد في $${k}$:\n$${k}\\times ${d}=${k*d}$`},
+      k*d,[d+k,d*k*k,Math.pow(k,3)*d,d]);}
+  if(t===4){const d=R.nz(-9,9);
+    return mkNum({cat:'det',text:`إذا كان $|A|=${d}$ فإن محدد المصفوفة المنقولة $|A^{T}|=$`,
+      sol:`محدد المصفوفة المنقولة يساوي محدد المصفوفة نفسها: $${d}$`},
+      d,[-d,0,d*d,d+1]);}
+  const a=R.nz(-4,5),e=R.nz(-4,5),i=R.nz(-4,5),b=R.int(-5,6),c=R.int(-5,6),f=R.int(-5,6);
+  const m=[[a,b,c],[0,e,f],[0,0,i]];
+  return mkNum({cat:'det',text:'احسب قيمة المحدد المثلثي:',block:`\\Delta=${vm(m)}`,
+    sol:`محدد المصفوفة المثلثية = حاصل ضرب عناصر القطر الرئيسي:\n$${a}\\times(${e})\\times(${i})=${a*e*i}$`},
+    a*e*i,[a+e+i,a*e*i+b,a*e*i-c,b*f*c]);
+}
+
+/* ============ 4) المصفوفات ============ */
+const randM2=(lo,hi)=>[[R.int(lo,hi),R.int(lo,hi)],[R.int(lo,hi),R.int(lo,hi)]];
+function gMatMul(){
+  const A=randM2(-2,4),B=randM2(-2,4),C=mul2(A,B);
+  const w=[mul2(B,A),mutM(C),mutM(C),[[C[0][0],C[1][0]],[C[0][1],C[1][1]]],[[A[0][0]*B[0][0],A[0][1]*B[0][1]],[A[1][0]*B[1][0],A[1][1]*B[1][1]]],mutM(mutM(C))];
+  return T({cat:'mat',text:'أوجد حاصل الضرب $A\\times B$:',block:`A=${pm(A)},\\quad B=${pm(B)}`,
+    sol:`نضرب صفوف $A$ في أعمدة $B$:\nالعنصر $(1,1)$: $${A[0][0]}\\times(${B[0][0]})+(${A[0][1]})\\times(${B[1][0]})=${C[0][0]}$\nوهكذا لباقي العناصر.`},pm(C),w.map(pm));
+}
+function gMatInv(){
+  let a,b,c,d,D;
+  let n=0;
+  do{a=R.int(-3,5);b=R.int(-3,5);c=R.int(-3,5);d=R.int(-3,5);D=a*d-b*c;n++;}while(Math.abs(D)!==1&&n<500);
+  if(Math.abs(D)!==1)return null;
+  const A=[[a,b],[c,d]],adj=[[d,-b],[-c,a]],inv=adj.map(r=>r.map(x=>x*D));
+  const neg=inv.map(r=>r.map(x=>-x));
+  const w=[neg,adj,[[a,-b],[-c,d]],[[d,b],[c,a]],[[inv[0][0],inv[1][0]],[inv[0][1],inv[1][1]]],mutM(inv)];
+  return T({cat:'mat',text:'أوجد معكوس المصفوفة $A$:',block:`A=${pm(A)}`,
+    sol:`$|A|=${a}\\times(${d})-(${b})\\times(${c})=${D}$\n$A^{-1}=\\dfrac{1}{|A|}\\begin{pmatrix}d&-b\\\\-c&a\\end{pmatrix}=\\dfrac{1}{${D}}${pm(adj)}$`},pm(inv),w.map(pm));
+}
+function gMatLin(){
+  const p=R.pick([1,2,3,-1,-2]),q=R.pick([1,2,3,-1,-2]);
+  const A=randM2(-3,4),B=randM2(-3,4);
+  const f=(P,Q)=>[[P*A[0][0]+Q*B[0][0],P*A[0][1]+Q*B[0][1]],[P*A[1][0]+Q*B[1][0],P*A[1][1]+Q*B[1][1]]];
+  const C=f(p,q);
+  const expr=(cx(p)+'A')+(q<0?'-':'+')+(Math.abs(q)===1?'':Math.abs(q))+'B';
+  const w=[f(q,p),f(p,-q),f(-p,q),mutM(C),mutM(C)];
+  return T({cat:'mat',text:`أوجد $${expr}$ إذا كانت:`,block:`A=${pm(A)},\\quad B=${pm(B)}`,
+    sol:`نضرب كل مصفوفة في معاملها ثم نجمع العناصر المتناظرة.`},pm(C),w.map(pm));
+}
+function gMatDet2(){
+  let a,b,c;
+  do{a=R.int(1,3);b=R.nz(-3,3);c=R.nz(-4,4);}while((b*c)%a!==0);
+  const x0=b*c/a;
+  return mkNum({cat:'mat',text:'أوجد قيمة $x$ التي تجعل المصفوفة التالية غير قابلة للعكس (محددها يساوي صفراً):',
+    block:`A=${pm([[a,b],[c,'x']])}`,
+    sol:`$|A|=${cx(a)}x-(${b})(${c})=${cx(a)}x${sg(-b*c)}=0\\Rightarrow x=${x0}$`},
+    x0,[-x0,b*c,x0+1,x0-1,a*b*c]);
+}
+
+/* ============ 5) ذات الحدين ============ */
+const termBin=(n,r,a,b)=>{
+  const coef=comb(n,r)*Math.pow(a,n-r)*Math.pow(b,r);
+  const xs=pw('x',n-r),ys=pw('y',r);
+  return `${coef===1&&(xs||ys)?'':coef}${xs}${ys}`;
+};
+function gBinTerms(){
+  const n=R.int(4,40);
+  const base=R.pick(['(a+b)','(2x+y)','(x-3)','(3x+2y)','(x+1)','(x^{2}+y)','(2a-b)']);
+  return mkNum({cat:'bin',text:'كم عدد حدود المفكوك:',block:`${base}^{${n}}`,
+    sol:`عدد حدود $(a+b)^n$ يساوي $n+1$\n$${n}+1=${n+1}$`},n+1,[n,n+2,n-1,2*n]);
+}
+function gBinKth(){
+  const n=R.int(5,9),k=R.int(2,Math.min(6,n)),r=k-1,a=R.int(1,3),b=R.int(1,3);
+  const w=[termBin(n,r+1,a,b),termBin(n,r-1>=0?r-1:r+2,a,b),`${comb(n,r)*Math.pow(a,r)*Math.pow(b,n-r)}${pw('x',n-r)}${pw('y',r)}`,termBin(n,Math.min(n,r+2),a,b)];
+  return T({cat:'bin',text:`أوجد الحد ${ORD[k]} في مفكوك:`,block:`(${cx(a)}x+${cx(b)}y)^{${n}}`,
+    sol:`الحد العام: $T_{r+1}=\\binom{n}{r}(${cx(a)}x)^{n-r}(${cx(b)}y)^{r}$\nللحد ${ORD[k]} نأخذ $r=${r}$:\n$\\binom{${n}}{${r}}(${cx(a)}x)^{${n-r}}(${cx(b)}y)^{${r}}=${termBin(n,r,a,b)}$`},
+    termBin(n,r,a,b),w);
+}
+function gBinCoeff(){
+  const n=R.int(5,9),m=R.int(2,n-1),a=R.int(1,3),b=R.int(1,4);
+  const v=comb(n,m)*Math.pow(a,m)*Math.pow(b,n-m);
+  return mkNum({cat:'bin',text:`أوجد معامل $x^{${m}}$ في مفكوك:`,block:`(${cx(a)}x+${b})^{${n}}`,
+    sol:`الحد الذي يحتوي $x^{${m}}$ هو $\\binom{${n}}{${m}}(${cx(a)}x)^{${m}}(${b})^{${n-m}}$\nمعامله $=${comb(n,m)}\\times${Math.pow(a,m)}\\times${Math.pow(b,n-m)}=${v}$`},
+    v,[comb(n,m)*Math.pow(a,n-m)*Math.pow(b,m),comb(n,m-1)*Math.pow(a,m)*Math.pow(b,n-m),comb(n,m+1)*Math.pow(a,m)*Math.pow(b,n-m),comb(n,m)*a*b]);
+}
+
+/* ============ 6) التباديل والتوافيق ============ */
+function gCommittee(){
+  const P=R.pick([['طلاب','طالبات','الطلاب','الطالبات'],['موظفين','موظفات','الموظفين','الموظفات'],['رجال','نساء','الرجال','النساء']]);
+  const m=R.int(4,9),w=R.int(3,8),k=R.int(3,5),N=m+w;
+  const t=R.int(0,4);let cond,v,sol;
+  if(t===0){cond='دون أي شروط';v=comb(N,k);sol=`$\\binom{${N}}{${k}}=${v}$`;}
+  else if(t===1){if(m<k)return null;cond=`إذا كانت مكوّنة من ${P[2]} فقط`;v=comb(m,k);sol=`$\\binom{${m}}{${k}}=${v}$`;}
+  else if(t===2){const i=R.int(1,k-1);if(i>m||k-i>w)return null;
+    cond=`إذا ضمّت ${i} من ${P[2]} و ${k-i} من ${P[3]}`;v=comb(m,i)*comb(w,k-i);
+    sol=`$\\binom{${m}}{${i}}\\times\\binom{${w}}{${k-i}}=${comb(m,i)}\\times${comb(w,k-i)}=${v}$`;}
+  else if(t===3){cond=`إذا ضمّت عضواً واحداً على الأقل من ${P[3]}`;v=comb(N,k)-comb(m,k);
+    sol=`الكل ناقص ما لا يحتوي ${P[3]}:\n$\\binom{${N}}{${k}}-\\binom{${m}}{${k}}=${comb(N,k)}-${comb(m,k)}=${v}$`;}
+  else{cond=`إذا كان أحد ${P[2]} المحدّدين عضواً فيها حتماً`;v=comb(N-1,k-1);sol=`نثبّت العضو ونختار $${k-1}$ من $${N-1}$:\n$\\binom{${N-1}}{${k-1}}=${v}$`;}
+  return mkNum({cat:'cnt',text:`من بين ${m} ${P[0]} و ${w} ${P[1]} يُراد تكوين لجنة مكوّنة من ${k} أفراد. بكم طريقة يمكن تكوينها ${cond}؟`,sol},
+    v,[comb(N,k),comb(N,k)-comb(m,k),comb(N-1,k-1),comb(N-1,k),perm(N,k),comb(m,k)+comb(w,k)]);
+}
+function gRoles(){
+  const n=R.int(6,12),noun=R.pick(['موظفين','أشخاص','أعضاء']);
+  if(R.int(0,1)===0){
+    const r=R.int(3,4),roles=r===3?'رئيس ونائب وسكرتير':'رئيس ونائب وسكرتير وأمين صندوق';
+    const v=perm(n,r);
+    return mkNum({cat:'cnt',text:`من بين ${n} ${noun} يُراد اختيار ${roles} (لكل منصب شخص مختلف). بكم طريقة يمكن ذلك؟`,
+      sol:`الترتيب مهم لأن المناصب مختلفة:\n$P(${n},${r})=${Array.from({length:r},(_,i)=>n-i).join('\\times ')}=${v}$`},
+      v,[comb(n,r),Math.pow(n,r),fact(n)]);
+  }
+  const k=R.int(4,5),v=n*(n-1)*comb(n-2,k-2);
+  return mkNum({cat:'cnt',text:`من بين ${n} ${noun} يُراد تكوين لجنة من ${k} أفراد بينهم رئيس ونائب رئيس. بكم طريقة يمكن ذلك؟`,
+    sol:`نختار الرئيس ثم النائب ثم بقية الأعضاء:\n$${n}\\times${n-1}\\times\\binom{${n-2}}{${k-2}}=${v}$`},
+    v,[comb(n,k),comb(n,k)*2,perm(n,k),n*(n-1)*comb(n,k-2)]);
+}
+function lettersCount(word){
+  const arr=Array.from(word),map={};arr.forEach(c=>map[c]=(map[c]||0)+1);
+  const counts=Object.values(map);let v=fact(arr.length);counts.forEach(c=>v/=fact(c));
+  return{n:arr.length,counts,v:Math.round(v),map};
+}
+const WORDS=['زلزال','سلسلة','الهدهد','جمجمة','LEVEL','APPLE','BANANA','LETTER','PEPPER','COMMITTEE','MISSISSIPPI','STATISTICS','MATHEMATICS','ENGINEER','BOOKKEEPER','SCIENCE','COFFEE','BALLOON','SUCCESS','ALGEBRA','CALCULUS','PARALLEL'];
+function gLetters(){
+  let word;
+  if(R.int(0,3)===0){
+    const L=R.shuffle(['A','B','C','D','E']).slice(0,R.int(2,4));
+    let s='';L.forEach(l=>s+=l.repeat(R.int(1,3)));
+    if(s.length<5||s.length>9)return null;
+    word=R.shuffle(Array.from(s)).sort().join('');
+    const lc=lettersCount(word);
+    return mkNum({cat:'cnt',text:`بكم طريقة يمكن ترتيب الأحرف التالية في صف واحد: {{${word}}}؟`,
+      sol:`$\\dfrac{${lc.n}!}{${lc.counts.filter(c=>c>1).map(c=>c+'!').join('\\times ')||'1'}}=${lc.v}$`},
+      lc.v,[fact(lc.n),fact(lc.n)/2,lc.v*2]);
+  }
+  word=R.pick(WORDS);
+  const lc=lettersCount(word),rep=lc.counts.filter(c=>c>1);
+  return mkNum({cat:'cnt',text:`بكم طريقة يمكن ترتيب أحرف الكلمة {{${word}}}؟`,
+    sol:`عدد الأحرف $${lc.n}$ ، ومع تكرار بعضها:\n$\\dfrac{${lc.n}!}{${rep.length?rep.map(c=>c+'!').join('\\times '):'1'}}=${lc.v}$`},
+    lc.v,[fact(lc.n),fact(lc.n)/2,lc.v*2,lc.v/2]);
+}
+function gNCr(){
+  const n=R.int(5,12),r=R.int(2,Math.min(5,n-1)),t=R.int(0,1);
+  if(t===0)return mkNum({cat:'cnt',text:`احسب قيمة $\\binom{${n}}{${r}}$ ($C(${n},${r})$):`,
+    sol:`$\\dfrac{${n}!}{${r}!\\,${n-r}!}=${comb(n,r)}$`},comb(n,r),[perm(n,r),comb(n,r+1),comb(n,r-1),comb(n+1,r)]);
+  return mkNum({cat:'cnt',text:`احسب قيمة $P(${n},${r})$:`,
+    sol:`$P(${n},${r})=${Array.from({length:r},(_,i)=>n-i).join('\\times ')}=${perm(n,r)}$`},perm(n,r),[comb(n,r),perm(n,r+1),perm(n,r-1),Math.pow(n,r)]);
+}
+function gFactRatio(){
+  const t=R.int(0,2);
+  if(t===0){const n=R.int(6,12),r=R.int(2,3),v=perm(n,r);
+    return mkNum({cat:'cnt',text:'احسب قيمة:',block:`\\dfrac{${n}!}{${n-r}!}`,sol:`$${Array.from({length:r},(_,i)=>n-i).join('\\times ')}=${v}$`},v,[comb(n,r),n*r,fact(r)]);}
+  if(t===1){const n=R.int(6,12),v=(n+1)*n;
+    return mkNum({cat:'cnt',text:'احسب قيمة:',block:`\\dfrac{${n+1}!}{${n-1}!}`,sol:`$${n+1}\\times${n}=${v}$`},v,[n+1,n-1,(n+1)*(n-1)]);}
+  const n=R.int(6,12),r=R.int(2,4),v=comb(n,r);
+  return mkNum({cat:'cnt',text:'احسب قيمة:',block:`\\dfrac{${n}!}{${r}!\\,${n-r}!}`,sol:`هذا هو $\\binom{${n}}{${r}}=${v}$`},v,[perm(n,r),comb(n,r+1),comb(n,r-1)]);
+}
+
+/* ============ 7) العلاقات ============ */
+function gRelation(){
+  const size=R.int(4,5),A=R.shuffle([1,2,3,4,5,6,7,8,9]).slice(0,size).sort((a,b)=>a-b);
+  const k=R.int(2,4),nn=R.int(5,11);
+  const defs=[
+    {d:'$x$ تقسم $y$',f:(x,y)=>y%x===0},
+    {d:'$x<y$',f:(x,y)=>x<y},
+    {d:'$x\\le y$',f:(x,y)=>x<=y},
+    {d:'$x+y$ عدد زوجي',f:(x,y)=>(x+y)%2===0},
+    {d:`$x-y$ من مضاعفات العدد $${k}$`,f:(x,y)=>(x-y)%k===0},
+    {d:'$x\\cdot y$ عدد زوجي',f:(x,y)=>(x*y)%2===0},
+    {d:`$x+y=${nn}$`,f:(x,y)=>x+y===nn},
+    {d:'$y=x$ أو $y=x+1$',f:(x,y)=>y===x||y===x+1}
+  ];
+  const df=R.pick(defs),Rel=[];
+  A.forEach(x=>A.forEach(y=>{if(df.f(x,y))Rel.push([x,y]);}));
+  const has=(x,y)=>Rel.some(p=>p[0]===x&&p[1]===y);
+  const refl=A.every(x=>has(x,x));
+  const sym=Rel.every(([x,y])=>has(y,x));
+  const anti=Rel.every(([x,y])=>x===y||!has(y,x));
+  const trans=Rel.every(([x,y])=>Rel.every(([u,v])=>u!==y||has(x,v)));
+  const names=['انعكاسية','تماثلية','ضد تماثلية','متعدية'],tr=[refl,sym,anti,trans];
+  const tc=tr.filter(Boolean).length;
+  const setTxt='$A=\\{'+A.join(',')+'\\}$';
+  const intro=`لتكن ${setTxt} وليكن $R$ علاقة على $A$ حيث $(x,y)\\in R$ إذا كان ${df.d}.`;
+  const shown=Rel.slice(0,14).map(p=>`(${p[0]},${p[1]})`).join(',')+(Rel.length>14?',\\dots':'');
+  const sol=`$R=\\{${shown}\\}$\nانعكاسية: ${refl?'نعم':'لا'} ، تماثلية: ${sym?'نعم':'لا'} ، ضد تماثلية: ${anti?'نعم':'لا'} ، متعدية: ${trans?'نعم':'لا'}`;
+  const kind=R.int(0,2);
+  if(kind===0&&(tc===1||tc===3)){
+    const askTrue=tc===1;
+    const correct=names[tr.findIndex(x=>x===askTrue)];
+    const wrong=names.filter((_,i)=>tr[i]!==askTrue);
+    return S_({cat:'rel',text:intro+(askTrue?' أي الخصائص التالية تتحقق للعلاقة $R$؟':' أي الخصائص التالية لا تتحقق للعلاقة $R$؟'),sol},correct,wrong);
+  }
+  if(kind===1||tc===0||tc===4||tc===2){
+    if(kind===2){
+      return mkNum({cat:'rel',text:intro+' كم عدد عناصر العلاقة $R$؟',sol},Rel.length,[A.length*A.length,A.length,Rel.length+1,Rel.length-1,A.length*(A.length-1)/2]);
+    }
+    const isEq=refl&&sym&&trans,isOrd=refl&&anti&&trans;
+    const labels=['علاقة تكافؤ وليست علاقة ترتيب','علاقة ترتيب وليست علاقة تكافؤ','علاقة تكافؤ وعلاقة ترتيب معاً','ليست علاقة تكافؤ ولا علاقة ترتيب'];
+    const idx=isEq&&isOrd?2:isEq?0:isOrd?1:3;
+    return S_({cat:'rel',text:intro+' أي العبارات التالية صحيحة؟',sol},labels[idx],labels.filter((_,i)=>i!==idx));
+  }
+  return mkNum({cat:'rel',text:intro+' كم عدد عناصر العلاقة $R$؟',sol},Rel.length,[A.length*A.length,A.length,Rel.length+1,Rel.length-1,A.length*(A.length-1)/2]);
+}
+
+/* ============ 8) النهايات والاتصال ============ */
+function randPoly(d,leadPos){
+  const c=[];
+  for(let i=0;i<=d;i++)c.push(i===0?(leadPos?R.int(1,7):R.nz(-6,7)):R.int(-5,6));
+  return c;
+}
+const cTerms=(c)=>c.map((x,i)=>({c:x,p:c.length-1-i}));
+function gLimInf(){
+  const t=R.pick(['eq','eq','lo','hi']);
+  let nd,dd;
+  if(t==='eq'){nd=dd=R.pick([1,2]);}
+  else if(t==='lo'){nd=R.int(1,2);dd=nd+R.int(1,2);}
+  else{dd=R.int(1,2);nd=dd+1;}
+  const num=randPoly(nd),den=randPoly(dd);
+  if(den[0]===0)return null;
+  const block=`\\lim_{x\\to\\infty}\\dfrac{${polyTex(cTerms(num))}}{${polyTex(cTerms(den))}}`;
+  const txt='أوجد قيمة النهاية:';
+  if(t==='eq'){
+    const f=fr(num[0],den[0]);
+    const w=[frT(fr(den[0],num[0])),'0','\\infty','-\\infty',frT(fr(-num[0],den[0]))];
+    if(den[1]!==0)w.push(frT(fr(num[1],den[1])));
+    return T({cat:'lim',text:txt,block,sol:`الدرجتان متساويتان، فالنهاية = حاصل قسمة معاملي أعلى قوة:\n$\\dfrac{${num[0]}}{${den[0]}}=${frT(f)}$`},frT(f),w);
+  }
+  if(t==='lo'){
+    return T({cat:'lim',text:txt,block,sol:`درجة البسط أقل من درجة المقام، فالنهاية $=0$`},'0',['\\infty','-\\infty','1',frT(fr(num[0],den[0])),frT(fr(den[0],num[0]))]);
+  }
+  const pos=num[0]*den[0]>0;
+  return T({cat:'lim',text:txt,block,sol:`درجة البسط أكبر من درجة المقام، والإشارة $${pos?'+':'-'}$، فالنهاية $${pos?'+\\infty':'-\\infty'}$`},pos?'\\infty':'-\\infty',[pos?'-\\infty':'\\infty','0',frT(fr(num[0],den[0])),'1']);
+}
+function gLimFactor(){
+  const c=R.pick([1,1,2]);let m=R.int(2,6),n=R.int(2,6);
+  if(m===n)return null;
+  const val=fr(m*Math.pow(c,m-1),n*Math.pow(c,n-1));
+  const top=`x^{${m}}-${Math.pow(c,m)}`,bot=`x^{${n}}-${Math.pow(c,n)}`;
+  const w=[frT(fr(n,m)),frT(fr(m-1,n-1)),frT(fr(m+1,n+1)),frT(fr(m*n,1)),frT(fr(m,n)),frT(fr(m*Math.pow(c,m),n*Math.pow(c,n)))];
+  return T({cat:'lim',text:'أوجد قيمة النهاية:',block:`\\lim_{x\\to ${c}}\\dfrac{${top}}{${bot}}`,
+    sol:`بالتحليل إلى عوامل أو بقاعدة لوبيتال (المشتقة):\n$\\dfrac{${m}${pw('x',m-1)}}{${n}${pw('x',n-1)}}$ عند $x=${c}$ تعطي $${frT(val)}$`},frT(val),w);
+}
+function gLimQuad(){
+  const c=R.nz(-5,6),r=R.nz(-5,6);if(c===r)return null;
+  const num=polyTex([{c:1,p:2},{c:-(c+r),p:1},{c:c*r,p:0}]),den=polyTex([{c:1,p:1},{c:-c,p:0}]);
+  return mkNum({cat:'lim',text:'أوجد قيمة النهاية:',block:`\\lim_{x\\to ${c}}\\dfrac{${num}}{${den}}`,
+    sol:`نحلل البسط: $${num}=${fac(c)}${fac(r)}$\nنختصر $${den}$ فتصبح النهاية $x-(${r})$ عند $x=${c}$:\n$${c}-(${r})=${c-r}$`},
+    c-r,[c+r,r-c,c*r,c,r]);
+}
+function gContK(){
+  const c=R.nz(-4,5),r=R.nz(-4,5);if(c===r)return null;
+  const num=polyTex([{c:1,p:2},{c:-(c+r),p:1},{c:c*r,p:0}]),den=polyTex([{c:1,p:1},{c:-c,p:0}]);
+  return mkNum({cat:'lim',text:`أوجد قيمة الثابت $k$ التي تجعل الدالة $f$ متصلة عند $x=${c}$:`,
+    block:`f(x)=\\begin{cases}\\dfrac{${num}}{${den}}&,\\ x\\neq ${c}\\\\[6pt] k&,\\ x=${c}\\end{cases}`,
+    sol:`شرط الاتصال: $f(${c})=\\lim_{x\\to ${c}}f(x)$\nنحلل البسط ونختصر فنجد النهاية $=${c}-(${r})=${c-r}$\nإذن $k=${c-r}$`},
+    c-r,[c+r,r-c,c*r,c,r]);
+}
+function gDomain(){
+  const a=R.pick([2,3,4]),c=R.nz(-4,6),t=R.int(0,1);
+  if(t===0){
+    const e=polyTex([{c:a,p:1},{c:-a*c,p:0}]);
+    return T({cat:'lim',text:'ما مجال تعريف الدالة:',block:`f(x)=\\sqrt{${e}}`,sol:`يجب أن يكون ما تحت الجذر $\\ge 0$:\n$${e}\\ge0\\Rightarrow x\\ge ${c}$`},
+      `[${c},\\infty)`,[`(${c},\\infty)`,`(-\\infty,${c}]`,`(-\\infty,${c})`,`[${-c},\\infty)`,'\\mathbb{R}']);
+  }
+  const e=polyTex([{c:-a,p:1},{c:a*c,p:0}]);
+  return T({cat:'lim',text:'ما مجال تعريف الدالة:',block:`f(x)=\\sqrt{${e}}`,sol:`يجب أن يكون ما تحت الجذر $\\ge 0$:\n$${e}\\ge0\\Rightarrow x\\le ${c}$`},
+    `(-\\infty,${c}]`,[`[${c},\\infty)`,`(-\\infty,${c})`,`(${c},\\infty)`,`(-\\infty,${-c}]`,'\\mathbb{R}']);
+}
+function gContSqrt(){
+  const a=R.pick([2,3,4]),c=R.nz(-4,6),t=R.int(0,1);
+  const L=['متصلة من اليمين فقط','متصلة من اليسار فقط','متصلة من الجهتين','غير متصلة من أي جهة'];
+  const e=t===0?polyTex([{c:a,p:1},{c:-a*c,p:0}]):polyTex([{c:-a,p:1},{c:a*c,p:0}]);
+  const idx=t===0?0:1;
+  return S_({cat:'lim',text:`ادرس اتصال الدالة التالية عند $x=${c}$:`,block:`f(x)=\\sqrt{${e}}`,
+    sol:`$f(${c})=0$ والدالة معرّفة ${t===0?`فقط عندما $x\\ge ${c}$`:`فقط عندما $x\\le ${c}$`}\nلذلك النهاية موجودة من ${t===0?'اليمين':'اليسار'} فقط وتساوي $f(${c})$.`},
+    L[idx],L.filter((_,i)=>i!==idx));
+}
+
+/* ============ 9) المشتقات ============ */
+const D_Q='أوجد $y\'$ للدالة:';
+function gDerPoly(){
+  const cnt=R.int(3,4);let pows=R.shuffle([5,4,3,2,1,0]).slice(0,cnt);
+  if(Math.random()<0.45)pows[pows.length-1]=R.pick([-1,-2,-3]);
+  if(Math.max(...pows)<2)return null;
+  const terms=pows.map(p=>({c:R.nz(-7,8),p}));
+  const d=terms.filter(t=>t.p!==0).map(t=>({c:t.c*t.p,p:t.p-1}));
+  const dT=polyTex(d);
+  const special=[];
+  const konst=terms.find(t=>t.p===0);
+  if(konst)special.push(polyTex([...d,{c:konst.c,p:0}]));
+  special.push(polyTex(terms.filter(t=>t.p!==0).map(t=>({c:t.c*t.p,p:t.p}))));
+  const w=[...special,...polyMut(d,6)];
+  return T({cat:'der',text:D_Q,block:`y=${polyTex(terms)}`,
+    sol:`نشتق كل حد: $(cx^{n})'=n\\,c\\,x^{n-1}$ والثابت مشتقته صفر:\n$y'=${dT}$`},dT,w);
+}
+function gDerExp(){
+  const t=R.int(0,2);
+  if(t===0){
+    const a=R.nz(-5,6),k=R.pick([2,3,4,5,-2,-3]);
+    const y=`${cx(a)}e^{${k}x}`,d=`${a*k}e^{${k}x}`;
+    return T({cat:'der',text:D_Q,block:`y=${y}`,sol:`$(e^{u})'=u'\\,e^{u}$ حيث $u=${k}x$ و $u'=${k}$:\n$y'=${a}\\times${k}\\,e^{${k}x}=${d}$`},d,
+      [y,`${k}e^{${k}x}`,`${a*k}xe^{${k}x-1}`,`${cx(a*k+1)}e^{${k}x}`,`${cx(a)}e^{${k*k}x}`]);
+  }
+  if(t===1){
+    const a=R.pick([1,2,3,4,5,-1,-2]);
+    const y=`e^{${cx(a)}x^{2}}`,d=`${cx(2*a)}x\\,e^{${cx(a)}x^{2}}`;
+    return T({cat:'der',text:D_Q,block:`y=${y}`,sol:`$u=${cx(a)}x^{2}\\Rightarrow u'=${cx(2*a)}x$\n$y'=u'e^{u}=${d}$`},d,
+      [`${cx(a)}e^{${cx(a)}x^{2}}`,`${cx(2*a)}e^{${cx(a)}x^{2}}`,`${cx(a)}x\\,e^{${cx(a)}x^{2}}`,`${cx(2*a)}x\\,e^{${cx(2*a)}x}`,`${cx(2*a)}x\\,e^{${cx(a)}x^{2}-1}`]);
+  }
+  const n=R.int(2,4),k=R.int(2,4);
+  const y=`${pw('x',n)}e^{${k}x}`,d=`${pw('x',n-1)}e^{${k}x}(${k}x+${n})`;
+  return T({cat:'der',text:D_Q,block:`y=${y}`,sol:`قاعدة الضرب $(uv)'=u'v+uv'$:\n$y'=${n}${pw('x',n-1)}e^{${k}x}+${k}${pw('x',n)}e^{${k}x}=${d}$`},d,
+    [`${n}${pw('x',n-1)}e^{${k}x}`,`${k}${pw('x',n)}e^{${k}x}`,`${pw('x',n-1)}e^{${k}x}(${k}x+1)`,`${pw('x',n-1)}e^{${k}x}(x+${n})`]);
+}
+function gDerLn(){
+  const t=R.int(0,1);
+  if(t===0){
+    const a=R.int(2,5),b=R.nz(-4,5),arg=polyTex([{c:a,p:1},{c:b,p:0}]);
+    return T({cat:'der',text:D_Q,block:`y=\\ln(${arg})`,sol:`$(\\ln u)'=\\dfrac{u'}{u}$ حيث $u'=${a}$:\n$y'=\\dfrac{${a}}{${arg}}$`},`\\dfrac{${a}}{${arg}}`,
+      [`\\dfrac{1}{${arg}}`,`\\dfrac{${a}}{(${arg})^{2}}`,`\\dfrac{${b}}{${arg}}`,`${a}\\ln(${arg})`]);
+  }
+  const a=R.int(1,5),b=R.int(1,6),arg=polyTex([{c:a,p:2},{c:b,p:0}]);
+  return T({cat:'der',text:D_Q,block:`y=\\ln(${arg})`,sol:`$(\\ln u)'=\\dfrac{u'}{u}$ حيث $u'=${cx(2*a)}x$:\n$y'=\\dfrac{${cx(2*a)}x}{${arg}}$`},`\\dfrac{${cx(2*a)}x}{${arg}}`,
+    [`\\dfrac{${cx(a)}x}{${arg}}`,`\\dfrac{${2*a}}{${arg}}`,`\\dfrac{1}{${arg}}`,`\\dfrac{${cx(2*a)}x}{(${arg})^{2}}`]);
+}
+function gDerSqrt(){
+  const n=R.int(2,3),a=R.int(1,6),b=R.int(1,5),K=a*n,arg=polyTex([{c:a,p:n},{c:b,p:0}]);
+  const d=K%2===0?`\\dfrac{${cx(K/2)}${pw('x',n-1)}}{\\sqrt{${arg}}}`:`\\dfrac{${K}${pw('x',n-1)}}{2\\sqrt{${arg}}}`;
+  return T({cat:'der',text:D_Q,block:`y=\\sqrt{${arg}}`,sol:`$(\\sqrt{u})'=\\dfrac{u'}{2\\sqrt{u}}$ حيث $u'=${K}${pw('x',n-1)}$`},d,
+    [`\\dfrac{${cx(a)}${pw('x',n-1)}}{\\sqrt{${arg}}}`,`\\dfrac{1}{2\\sqrt{${arg}}}`,`\\dfrac{${K}${pw('x',n-1)}}{\\sqrt{${arg}}}`,`${K}${pw('x',n-1)}\\sqrt{${arg}}`,`\\dfrac{${K}${pw('x',n-1)}}{2${arg.length?'':''}(${arg})}`]);
+}
+function gDerPow(){
+  const a=R.int(1,4),b=R.int(1,5),n=R.int(3,6),arg=polyTex([{c:a,p:2},{c:b,p:0}]);
+  const d=`${cx(2*a*n)}x(${arg})^{${n-1}}`;
+  return T({cat:'der',text:D_Q,block:`y=(${arg})^{${n}}`,sol:`قاعدة السلسلة: $y'=n\\,u^{n-1}\\,u'$ حيث $u'=${cx(2*a)}x$:\n$y'=${n}(${arg})^{${n-1}}\\times${cx(2*a)}x=${d}$`},d,
+    [`${n}(${arg})^{${n-1}}`,`${cx(2*a)}x(${arg})^{${n-1}}`,`${cx(2*a*n)}x(${arg})^{${n}}`,`${cx(a*n)}x(${arg})^{${n-1}}`]);
+}
+function gDerMix(){
+  const a=R.int(1,5),b=R.int(1,5),c=R.int(1,6),arg=polyTex([{c:b,p:2},{c:c,p:0}]);
+  const E=`e^{${cx(a)}x^{2}}`;
+  const d=`${cx(2*a)}x\\,${E}+\\dfrac{${cx(2*b)}x}{${arg}}`;
+  return T({cat:'der',text:D_Q,block:`y=${E}+\\ln(${arg})`,sol:`نشتق كل حد على حدة:\n$(${E})'=${cx(2*a)}x\\,${E}$\n$(\\ln(${arg}))'=\\dfrac{${cx(2*b)}x}{${arg}}$`},d,
+    [`${cx(2*a)}x\\,${E}+\\dfrac{${b}}{${arg}}`,`${cx(a)}x\\,${E}+\\dfrac{${cx(2*b)}x}{${arg}}`,`${cx(2*a)}x\\,e^{${cx(2*a)}x}+\\dfrac{${cx(2*b)}x}{${arg}}`,`${cx(2*a)}x\\,${E}+\\dfrac{1}{${arg}}`,`${cx(2*a)}x\\,${E}+\\dfrac{${cx(2*b)}x}{(${arg})^{2}}`]);
+}
+
+/* ============ 10) التكامل ============ */
+const evalT=(ts,x)=>ts.reduce((s,t)=>s+t.c*Math.pow(x,t.p),0);
+function gIntPoly(){
+  const cnt=R.int(2,4),pows=R.shuffle([0,1,2,3,4]).slice(0,cnt);
+  const anti=pows.map(p=>({c:R.nz(-5,6),p:p+1}));
+  const integ=anti.map(t=>({c:t.c*t.p,p:t.p-1}));
+  const aT=polyTex(anti);
+  const w=[...polyMut(anti,6).map(x=>x+'+C'),polyTex(integ)+'+C',aT];
+  return T({cat:'int',text:'أوجد قيمة التكامل:',block:`\\int\\left(${polyTex(integ)}\\right)dx`,
+    sol:`$\\int cx^{n}dx=\\dfrac{c\\,x^{n+1}}{n+1}$ لكل حد، ونضيف ثابت التكامل:\n$${aT}+C$`},aT+'+C',w);
+}
+function gIntDef(){
+  const cnt=R.int(2,3),pows=R.shuffle([0,1,2,3]).slice(0,cnt);
+  const anti=pows.map(p=>({c:R.nz(-4,5),p:p+1}));
+  const integ=anti.map(t=>({c:t.c*t.p,p:t.p-1}));
+  const lo=R.int(0,1),hi=lo+R.int(1,3);
+  const Fh=evalT(anti,hi),Fl=evalT(anti,lo),v=Fh-Fl;
+  return mkNum({cat:'int',text:'احسب قيمة التكامل المحدود:',block:`\\int_{${lo}}^{${hi}}\\left(${polyTex(integ)}\\right)dx`,
+    sol:`$F(x)=${polyTex(anti)}$\n$F(${hi})-F(${lo})=${Fh}-(${Fl})=${v}$`},
+    v,[Fh+Fl,Fh,-v,Fl]);
+}
+function gIntExp(){
+  const k=R.int(2,5),m=R.int(1,4);
+  return T({cat:'int',text:'أوجد قيمة التكامل:',block:`\\int ${m*k}\\,e^{${k}x}\\,dx`,
+    sol:`$\\int e^{kx}dx=\\dfrac{1}{k}e^{kx}$:\n$${m*k}\\times\\dfrac{1}{${k}}e^{${k}x}+C=${cx(m)}e^{${k}x}+C$`},`${cx(m)}e^{${k}x}`,
+    [`${m*k}e^{${k}x}`,`${m*k*k}e^{${k}x}`,`${m*k}xe^{${k}x}`,`${cx(m)}e^{${k+1}x}`],'+C');
+}
+function gIntLog(){
+  const m=R.int(1,4),b=R.int(1,6);
+  return T({cat:'int',text:'أوجد قيمة التكامل:',block:`\\int\\dfrac{${cx(2*m)}x}{x^{2}+${b}}\\,dx`,
+    sol:`البسط هو مشتقة المقام مضروباً في $${m}$، لذلك:\n$${cx(m)}\\ln(x^{2}+${b})+C$`},`${cx(m)}\\ln(x^{2}+${b})`,
+    [`${cx(2*m)}\\ln(x^{2}+${b})`,`${cx(m)}\\ln|x|`,`\\dfrac{${cx(m)}x^{2}}{x^{2}+${b}}`,`${cx(2*m)}x\\ln(x^{2}+${b})`],'+C');
+}
+function gIntPow(){
+  const a=R.int(2,5),b=R.int(1,5),n=R.int(3,7),arg=polyTex([{c:a,p:1},{c:b,p:0}]);
+  const den=a*(n+1);
+  return T({cat:'int',text:'أوجد قيمة التكامل:',block:`\\int(${arg})^{${n}}\\,dx`,
+    sol:`$\\int u^{n}dx=\\dfrac{u^{n+1}}{(n+1)\\,u'}$ حيث $u'=${a}$:\n$\\dfrac{(${arg})^{${n+1}}}{${a}\\times${n+1}}+C$`},`\\dfrac{(${arg})^{${n+1}}}{${den}}`,
+    [`\\dfrac{(${arg})^{${n+1}}}{${n+1}}`,`\\dfrac{(${arg})^{${n+1}}}{${a}}`,`\\dfrac{(${arg})^{${n+1}}}{${a*n}}`,`\\dfrac{(${arg})^{${n}}}{${den}}`],'+C');
+}
+
+/* ============ الدروس ============ */
+const TOPICS=[
+  {id:'explog',name:'الأسس واللوغاريتمات',gens:[gExpRatio,gLogSum,gLogLaw,gExpEq,gLogEq]},
+  {id:'eq',name:'المعادلات والأنظمة',gens:[gQuad,gQuadSP,gSystem]},
+  {id:'det',name:'المحددات',gens:[gDet3,gDetX,gDetProp,gDetRule]},
+  {id:'mat',name:'المصفوفات',gens:[gMatMul,gMatInv,gMatLin,gMatDet2]},
+  {id:'bin',name:'مفكوك ذات الحدين',gens:[gBinTerms,gBinKth,gBinCoeff]},
+  {id:'cnt',name:'التباديل والتوافيق',gens:[gCommittee,gRoles,gLetters,gNCr,gFactRatio]},
+  {id:'rel',name:'العلاقات',gens:[gRelation]},
+  {id:'lim',name:'النهايات والاتصال',gens:[gLimInf,gLimFactor,gLimQuad,gContK,gDomain,gContSqrt]},
+  {id:'der',name:'المشتقات',gens:[gDerPoly,gDerExp,gDerLn,gDerSqrt,gDerPow,gDerMix]},
+  {id:'int',name:'التكامل',gens:[gIntPoly,gIntDef,gIntExp,gIntLog,gIntPow]}
+];
+
+const S={enabled:new Set(TOPICS.map(t=>t.id)),right:0,wrong:0,streak:0,qnum:0,limit:0,sRight:0,sTotal:0,seen:new Set(),cur:null,answered:false};
+
+function generate(){
+  const ids=[...S.enabled];if(!ids.length)return null;
+  for(let t=0;t<400;t++){
+    const tid=R.pick(ids),topic=TOPICS.find(x=>x.id===tid);
+    const g=R.pick(topic.gens);
+    let q=null;try{q=g();}catch(e){console.error(e);}
+    if(q&&!S.seen.has(q.key)){S.seen.add(q.key);q.topic=topic.name;return q;}
+  }
+  return null;
+}
+
+const root=typeof window!=='undefined'?window:globalThis;
+root.__MQ={TOPICS,generate,S};
+if(typeof document==='undefined'||!document.getElementById)return;
+
+/* ============ الواجهة ============ */
+const $=id=>document.getElementById(id);
+const stage=$('stage');
+const LET=['أ','ب','ج','د'];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function mathHTML(tex,display){
+  if(root.katex){try{return '<span class="m">'+root.katex.renderToString(tex,{throwOnError:false,displayMode:!!display})+'</span>';}catch(e){}}
+  return '<span class="m raw">'+esc(tex)+'</span>';
+}
+function renderMixed(str){
+  return str.split('$').map((seg,i)=>i%2===1?mathHTML(seg,false):esc(seg).replace(/\{\{(.+?)\}\}/g,'<bdi class="word">$1</bdi>')).join('');
+}
+
+function renderStats(){
+  const tot=S.right+S.wrong;
+  $('sRight').textContent=S.right;$('sWrong').textContent=S.wrong;$('sStreak').textContent=S.streak;
+  $('sAcc').textContent=(tot?Math.round(S.right*100/tot):0)+'%';$('sSeen').textContent=S.seen.size;
+}
+function renderChips(){
+  $('chips').innerHTML=TOPICS.map(t=>`<button class="chip" data-id="${t.id}" aria-pressed="${S.enabled.has(t.id)}">${t.name}</button>`).join('');
+}
+const MODES=[[0,'تدريب مفتوح'],[10,'اختبار 10 أسئلة'],[20,'اختبار 20 سؤالاً']];
+function renderModes(){
+  $('modes').innerHTML=MODES.map(([v,n])=>`<button data-v="${v}" aria-pressed="${S.limit===v}">${n}</button>`).join('');
+}
+
+function showQuestion(){
+  const q=generate();
+  if(!q){stage.innerHTML='<article class="sheet"><p class="qtext">لا توجد أسئلة جديدة متاحة في الدروس المحددة. فعّل دروساً أخرى للمتابعة.</p></article>';renderStats();return;}
+  S.cur=q;S.answered=false;S.qnum++;
+  stage.innerHTML=`<article class="sheet">
+    <div class="qn"><b>${S.qnum}</b>${S.limit?`<small>من ${S.limit}</small>`:''}</div>
+    <span class="tag">${esc(q.topic)}</span>
+    <p class="qtext">${renderMixed(q.text)}</p>
+    ${q.block?`<div class="blk">${mathHTML(q.block,true)}</div>`:''}
+    <div class="opts" role="group" aria-label="الخيارات">
+      ${q.options.map((o,i)=>`<button class="opt" data-i="${i}"><span class="let">${LET[i]}</span><span class="otext">${renderMixed(o)}</span></button>`).join('')}
+    </div>
+    <div class="fb" id="fb" aria-live="polite"></div>
+    <div class="actions">
+      ${S.limit?'<span></span>':'<button class="btn ghost" id="skip">تخطّي السؤال</button>'}
+      <button class="btn" id="next" hidden>${S.limit&&S.qnum>=S.limit?'عرض النتيجة':'السؤال التالي'}</button>
+    </div>
+  </article>`;
+  renderStats();
+}
+
+function answer(i){
+  if(S.answered||!S.cur)return;
+  S.answered=true;
+  const q=S.cur,ok=i===q.answer;
+  document.querySelectorAll('.opt').forEach((b,k)=>{
+    b.disabled=true;
+    if(k===q.answer)b.classList.add('correct');
+    else if(k===i)b.classList.add('wrong');
+  });
+  S.sTotal++;
+  if(ok){S.right++;S.sRight++;S.streak++;}else{S.wrong++;S.streak=0;}
+  $('fb').innerHTML=`<div class="verdict ${ok?'ok':'bad'}">${ok?'إجابة صحيحة':'إجابة غير صحيحة، الصحيحة هي ('+LET[q.answer]+')'}</div>`+
+    (q.sol?`<div class="sol"><span class="t">الحل</span>${renderMixed(q.sol).replace(/\n/g,'<br>')}</div>`:'');
+  $('next').hidden=false;$('next').focus({preventScroll:true});
+  const sk=$('skip');if(sk)sk.hidden=true;
+  renderStats();
+}
+
+function showResult(){
+  const pct=S.sTotal?Math.round(S.sRight*100/S.sTotal):0;
+  const msg=pct>=90?'ممتاز، مستواك جاهز للاختبار':pct>=70?'جيد جداً، راجع الأسئلة التي أخطأت فيها':pct>=50?'مقبول، تحتاج إلى مزيد من التدريب':'ابدأ بمراجعة الدروس ثم أعد المحاولة';
+  stage.innerHTML=`<article class="sheet result">
+    <div class="qn"><b>✓</b></div>
+    <h2>نتيجة الاختبار</h2>
+    <div class="big">${S.sRight} / ${S.sTotal}</div>
+    <p>${pct}% - ${msg}</p>
+    <div class="actions"><button class="btn ghost" id="openMode">تدريب مفتوح</button><button class="btn" id="again">اختبار جديد</button></div>
+  </article>`;
+}
+
+function startSession(){S.qnum=0;S.sRight=0;S.sTotal=0;showQuestion();}
+
+stage.addEventListener('click',e=>{
+  const opt=e.target.closest('.opt');
+  if(opt){answer(+opt.dataset.i);return;}
+  if(e.target.closest('#next')){
+    if(S.limit&&S.qnum>=S.limit)showResult();else showQuestion();
+    return;
+  }
+  if(e.target.closest('#skip')){showQuestion();return;}
+  if(e.target.closest('#again')){startSession();return;}
+  if(e.target.closest('#openMode')){S.limit=0;renderModes();startSession();return;}
+});
+$('chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip');if(!b)return;
+  const id=b.dataset.id;
+  if(S.enabled.has(id)){if(S.enabled.size===1)return;S.enabled.delete(id);}else S.enabled.add(id);
+  renderChips();
+});
+$('allOn').addEventListener('click',()=>{TOPICS.forEach(t=>S.enabled.add(t.id));renderChips();});
+$('modes').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  S.limit=+b.dataset.v;renderModes();startSession();
+});
+document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(/^[1-4]$/.test(e.key)){answer(+e.key-1);}
+  else if(e.key==='Enter'&&S.answered&&!e.target.closest('button')){const n=$('next');if(n)n.click();}
+});
+
+renderChips();renderModes();renderStats();
+function boot(){startSession();}
+if(document.readyState==='complete')boot();else window.addEventListener('load',boot);
+})();
+</script>
+</body>
+</html>
